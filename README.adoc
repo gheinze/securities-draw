@@ -1,0 +1,67 @@
+=== Options
+
+JavaScript library for building SVG elements to represent options.
+
+==== Option State
+
+A call to `a4.generateOptionStateSvg` is used to generate an SVG image:
+
+===== Covered CALL example:
+
+[source,javascript]
+----
+var underlyingCommodityPriceAtPurchase = 60;
+var strikePrice = 65;
+var premium = 6;
+
+var option = new a4.Option(
+    a4.optionType.CALL
+   ,underlyingCommodityPriceAtPurchase
+   ,strikePrice
+   ,premium
+);
+
+var currentPrice = 62;
+var plotRange = { start: 40, end: 80 };
+
+var container = d3.select("#optionSvgContainerId");
+
+a4.generateOptionStateSvg(container, option, currentPrice, plotRange);
+----
+
+image:img/callOptionState.png[]
+
+
+===== PUT example:
+
+[source,javascript]
+----
+var underlyingCommodityPriceAtPurchase = 60;
+var strikePrice = 55;
+var premium = 3;
+
+var option = new a4.Option(
+    a4.optionType.PUT
+   ,underlyingCommodityPriceAtPurchase
+   ,strikePrice
+   ,premium
+);
+
+var currentPrice = 64;
+var plotRange = { start: 40, end: 80 };
+
+var container = d3.select("#optionSvgContainerId");
+
+a4.generateOptionStateSvg(container, option, currentPrice, plotRange);
+----
+
+image:img/putOptionState.png[]
+
+===== How to read the option:
+
+* the solid line indicates option expiry range
+* the dashed line indicates option exercise range
+* the intersection of the lines represents the strike price
+* the black dot was the price of the underlying commodity at time of option purchase
+* the green triangle represents current price of underlying commodity
+* the red tick indicates the strike price extended by the premium (i.e. break even price)
