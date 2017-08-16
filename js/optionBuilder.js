@@ -3,7 +3,7 @@
 var a4 = a4 || {};
 
 /**
- * This file builds the library "a4" which exposes:
+ * Build the "a4" library which exposes:
  *   o optionType:  an enum to specify the option as either CALL or PUT
  *   o Option:      a class to contain the attributes specifying an option
  *   o generateOptionStateSvg: a function for generating an SVG object to represent the option
@@ -212,7 +212,7 @@ $(document).ready(function () {
 
         svg
                 .on("mouseover", function() { return tooltipDiv.style("visibility", "visible"); })
-                .on("mousemove", function() { return tooltipDiv.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px"); })
+                .on("mousemove", function(event) { return tooltipDiv.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px"); })
                 .on("mouseout",  function() { return tooltipDiv.style("visibility", "hidden"); });
 
     }

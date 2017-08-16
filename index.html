@@ -17,6 +17,7 @@
         <script type="text/javascript" src="lib/d3-shape.min.js"></script>
 
         <script type="text/javascript" src="js/optionBuilder.js"></script>
+        <script type="text/javascript" src="js/optionGraphBuilder.js"></script>
 
         <link rel="stylesheet" href="css/main.css" type="text/css">
 
@@ -24,7 +25,16 @@
 
     <body>
 
-        <div id="optionSvgContainerId"></div>
+        <h2>Example Call Option Plot</h2>
+        <p>Hover over plot for option state details</p>
+        <div id="callOptionSvgContainerId"></div>
+
+        <h2>Example Put Option Plot</h2>
+        <div id="putOptionSvgContainerId"></div>
+
+        <h2>Example Option Graphing</h2>
+        <div id="optionGraphSvgContainerId"></div>
+
 
         <script>
 
@@ -37,18 +47,21 @@
             var currentPrice = 62;
             var plotRange = { start: 40, end: 80 };
 
-            var container = d3.select("#optionSvgContainerId");
+            var callContainer = d3.select("#callOptionSvgContainerId");
+            a4.generateOptionStateSvg(callContainer, option, currentPrice, plotRange);
 
-            a4.generateOptionStateSvg(container, option, currentPrice, plotRange);
-
-            container.append("p");
 
             option.optionType = a4.optionType.PUT;
             option.strikePrice = 55;
             option.premium = 3;
             currentPrice = 64;
 
-            a4.generateOptionStateSvg(container, option, currentPrice, plotRange);
+            var putContainer = d3.select("#putOptionSvgContainerId");
+            a4.generateOptionStateSvg(putContainer, option, currentPrice, plotRange);
+
+
+            var graphContainer = d3.select("#optionGraphSvgContainerId");
+            a4.generateOptionGraphSvg(graphContainer);
 
         </script>
 
