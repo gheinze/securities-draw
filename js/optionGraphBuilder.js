@@ -21,22 +21,49 @@ $(document).ready(function () {
     "use strict";
 
     exports.generateOptionGraphSvg = generateOptionGraphSvg;
+    exports.measures = measures(new Date());
+
+
+    function measures(today) {
+        return {
+            askPrice: { label: 'Ask Price'
+                       ,extractFrom: function(option) {return option.askPrice;}
+                       ,scale: d3.scaleLinear()
+                      }
+           ,askRate:  { label: 'Ask % Return'
+                       ,extractFrom: function(option) {
+                           var fractionalYear = 365 / (today - option.expiryDate) / (1000 * 3600 * 24);
+                           return option.askPrice;
+                       }
+                       ,scale: d3.scaleLinear()
+                      }
+           ,bidPrice: { label: 'Bid Price'
+                       ,extractFrom: function(option) {return option.bidPrice;}
+                       ,scale: d3.scaleLinear()
+                      }
+           ,lastPrice: { label: 'Last Price'
+                       ,extractFrom: function(option) {return option.lastPrice;}
+                       ,scale: d3.scaleLinear()
+                      }
+        };
+    }
 
 
     function generateOptionGraphSvg(container) {
 
         var svgExtents = defaultOptionSvgExtents();
-
         var parseOptionDate = d3.timeParse("%Y-%m-%d");
 
+        var yMeasure = exports.measures.askRate;
+
         var x = d3.scaleTime().range([0, svgExtents.dataArea.w]);
-        var y = d3.scaleLinear().range([svgExtents.dataArea.h, 0]);
+        var yScale = yMeasure.scale.range([svgExtents.dataArea.h, 0]);
         var z = d3.scaleOrdinal(d3.schemeCategory20);
 
         var line = d3.line()
             .curve(d3.curveBasis)
             .x(function(d) { return x(d.expiryDate); })
-            .y(function(d) { return y(d.askPrice); })
+            .y(function(option) { return yScale(yMeasure.extractFrom(option)); })
         ;
 
         var svg = container
@@ -46,6 +73,7 @@ $(document).ready(function () {
             .append("g")
                 .attr("transform", "translate(" + svgExtents.margin.left + "," + svgExtents.margin.top + ")")
         ;
+
 
         //d3.json("data/options_simplified.json", function(data){
         d3.json("data/options.json", function(data){
@@ -63,7 +91,7 @@ $(document).ready(function () {
             });
 
             x.domain(d3.extent(calls, function(d) { return d.expiryDate; }));
-            y.domain([0, d3.max(calls, function(d) {return d.askPrice;})]);
+            yScale.domain([0, d3.max(calls, function(option) {return yMeasure.extractFrom(option);})]);
             z.domain(d3.map(function(d) { return d.displayStrikePrice; }));
 
             // callStrikePrices = Array.from(new Set(optionData.calls.map(function(x){return x.strikePrice;})));
@@ -81,13 +109,13 @@ $(document).ready(function () {
 
             svg.append("g")
                 .attr("class", "axis axis--y")
-                .call(d3.axisLeft(y))
+                .call(d3.axisLeft(yScale))
               .append("text")
                 .attr("transform", "rotate(-90)")
                 .attr("y", 6)
                 .attr("dy", "0.71em")
                 .attr("fill", "#000")
-                .text("Ask Price")
+                .text(yMeasure.label)
             ;
 
             var strike = svg.selectAll(".strike")
@@ -102,7 +130,7 @@ $(document).ready(function () {
 
             strike.append("text")
                 .datum(function(d) { return {id: d.key, value: d.values[d.values.length - 1]}; })
-                .attr("transform", function(d) { return "translate(" + x(d.value.expiryDate) + "," + y(d.value.askPrice) + ")"; })
+                .attr("transform", function(d) { return "translate(" + x(d.value.expiryDate) + "," + yScale(yMeasure.extractFrom(d.value)) + ")"; })
                 .attr("x", 3)
                 .attr("dy", "0.35em")
                 .style("font", "10px sans-serif")
